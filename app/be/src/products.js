@@ -2,7 +2,7 @@ const { pool } = require('./db');
 
 const CATEGORIES = ['Electronics', 'Fashion', 'Books', 'Home'];
 const MAX_PRICE = 2147483647; // upper limit of the INTEGER price column
-
+//comment without any formatting
 function toProduct(row) {
   return {
     id: row.id,
