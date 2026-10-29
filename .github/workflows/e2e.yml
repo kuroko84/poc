@@ -15,12 +15,23 @@ permissions:
   contents: read
   pull-requests: write # PR summary comment
 
+# jobs:
+#   e2e:
+#     # This name is the required status check in branch protection
+#     name: e2e
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 20
 jobs:
   e2e:
     # This name is the required status check in branch protection
     name: e2e
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.E2E_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 20
+    env:
+      COMPOSE_PROJECT_NAME: poc-ci # keep CI containers separate from the local app
+    defaults:
+      run:
+        shell: bash # Git Bash on Windows runners, so commands match Ubuntu
     steps:
       - uses: actions/checkout@v7
 
