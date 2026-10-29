@@ -101,8 +101,9 @@ npm run app:reset     # xoá DB, dựng lại từ seed
 
 ## 5. 🔄 Đang làm
 
-- P3 đã viết xong. User đã tải Docker Desktop, đang tự đẩy code lên GitHub (P6) và tự làm Luồng 1, 2.
-- Chạy `npm run test:e2e` để xác nhận vẫn `1 passed` sau các sửa ở mục 4, **trước** khi push lên GitHub.
+- Code đã lên GitHub. **Luồng 2 đã kiểm chứng trên GitHub Actions (2026-10-29):** comment PR báo `❌ failed | 6. Verify product saved correctly in DB`, đúng như mong đợi.
+- Còn lại: xác nhận nút Merge bị khoá (branch protection với check `e2e`), rồi đóng PR Luồng 2, không merge.
+- Tiếp theo: P5 (Luồng 3), chờ user mô tả.
 - User cần xác nhận lại `npm run report` chạy được sau khi sửa lỗi port (tắt container UI mode cũ bằng `Ctrl+C` trước).
 
 ## 6. ⏭️ Sắp làm
