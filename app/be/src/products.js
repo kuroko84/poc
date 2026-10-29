@@ -7,7 +7,7 @@ function toProduct(row) {
   return {
     id: row.id,
     name: row.name,
-    price: row.price,
+    price: row.price / 100, // convert cents to dollars
     category: row.category,
     createdBy: row.created_by,
     createdAt: row.created_at,
@@ -47,7 +47,7 @@ async function create(req, res) {
     `INSERT INTO products (name, price, category, created_by)
      VALUES ($1, $2, $3, $4)
      RETURNING id, name, price, category, created_at`,
-    [input.name.trim(), input.price, input.category, req.user.id],
+    [input.name.trim(), input.price * 100, input.category, req.user.id],
   );
   res.status(201).json(toProduct({ ...rows[0], created_by: req.user.username }));
 }
