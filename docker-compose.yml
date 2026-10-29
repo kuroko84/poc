@@ -1,0 +1,63 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: poc
+      POSTGRES_PASSWORD: poc
+      POSTGRES_DB: poc
+    ports:
+      - "5433:5432"   # exposed so E2E tests can verify data directly in the DB
+    volumes:
+      - ./app/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U poc -d poc"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  be:
+    build: ./app/be
+    environment:
+      DATABASE_URL: postgres://poc:poc@db:5432/poc
+      PORT: 3000
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/health || exit 1"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  fe:
+    build: ./app/fe
+    ports:
+      - "8080:80"
+    depends_on:
+      be:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ > /dev/null || exit 1"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  # Playwright runner. Only started on demand: `docker compose run --rm e2e`
+  e2e:
+    build:
+      context: .
+      dockerfile: e2e/Dockerfile
+    profiles: ["test"]
+    environment:
+      BASE_URL: http://fe
+      DB_URL: postgres://poc:poc@db:5432/poc
+      CI: ${CI:-}
+    volumes:
+      - ./e2e:/work/e2e   # live test code in, reports/traces back out to the host
+    # no fixed ports: each npm script publishes only the one it needs (UI 8081, report 9323)
+    ipc: host
+    depends_on:
+      db:
+        condition: service_healthy
+      fe:
+        condition: service_healthy

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>POC Shop - Products</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <strong>POC Shop</strong>
+    <span>Logged in as <b data-testid="current-user"></b></span>
+    <button type="button" class="link" data-testid="logout-btn">Logout</button>
+  </header>
+
+  <main class="card">
+    <h1>Products</h1>
+    <p class="summary">Total products: <span data-testid="product-count">…</span></p>
+
+    <form id="product-form" class="inline-form" novalidate>
+      <input name="name" placeholder="Product name" data-testid="product-name" required>
+      <input name="price" type="number" min="0" step="1" placeholder="Price (VND)" data-testid="product-price" required>
+      <select name="category" data-testid="product-category">
+        <option>Electronics</option>
+        <option>Fashion</option>
+        <option>Books</option>
+        <option>Home</option>
+      </select>
+      <button type="submit" data-testid="add-btn">Add</button>
+    </form>
+    <p class="error" data-testid="form-error" hidden></p>
+    <p class="success" data-testid="form-success" hidden></p>
+
+    <table>
+      <thead>
+        <tr><th>#</th><th>Name</th><th>Price</th><th>Category</th><th>Created by</th></tr>
+      </thead>
+      <tbody data-testid="product-list"></tbody>
+    </table>
+  </main>
+  <script type="module" src="/js/products.js"></script>
+</body>
+</html>

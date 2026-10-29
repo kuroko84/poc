@@ -1,0 +1,65 @@
+name: E2E
+
+on:
+  # No paths-ignore: the required check must report on every PR, or a docs-only PR stays "pending" forever
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# A new push to the same PR cancels the run still in progress
+concurrency:
+  group: e2e-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write # PR summary comment
+
+jobs:
+  e2e:
+    # This name is the required status check in branch protection
+    name: e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      # Same command as `npm run test:e2e`: builds db + be + fe, then runs Playwright in its container
+      - name: Run E2E
+        id: e2e
+        env:
+          CI: 'true'
+        run: docker compose run --rm --build e2e
+
+      - name: App logs
+        if: failure()
+        run: docker compose logs --no-color db be fe
+
+      - name: Upload Playwright report
+        id: upload
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-${{ github.run_number }}-${{ github.run_attempt }}
+          path: |
+            e2e/playwright-report
+            e2e/test-results
+          if-no-files-found: ignore
+          retention-days: 14
+
+      # Reporting only: a bug here must not block the merge
+      - name: Summarize results
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        uses: actions/github-script@v9
+        env:
+          E2E_OUTCOME: ${{ steps.e2e.outcome }}
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+        with:
+          script: |
+            const summarize = require('./.github/scripts/e2e-summary.js');
+            await summarize({ github, context, core });
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v

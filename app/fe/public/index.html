@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>POC Shop - Login</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main class="card narrow">
+    <h1>POC Shop</h1>
+    <form id="login-form" novalidate>
+      <label>
+        Username
+        <input name="username" data-testid="username" autocomplete="username" required>
+      </label>
+      <label>
+        Password
+        <input name="password" type="password" data-testid="password" autocomplete="current-password" required>
+      </label>
+      <p class="error" data-testid="login-error" hidden></p>
+      <button type="submit" data-testid="login-btn">Login</button>
+    </form>
+  </main>
+  <script type="module" src="/js/login.js"></script>
+</body>
+</html>
